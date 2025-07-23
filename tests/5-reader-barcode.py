@@ -6,5 +6,5 @@ img = cv2.imread("recorte.png")
 barcodes = decode(img)
 
 for barcode in barcodes:
-    print("📦 Código:", barcode.data.decode("utf-8"))
-    print("📄 Tipo:", barcode.type)
+    print("código:", barcode.data.decode("utf-8"))
+    print("tipo:", barcode.type)

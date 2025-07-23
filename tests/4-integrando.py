@@ -96,8 +96,7 @@ def on_click():
 
     root.mainloop()   
 
-def oi () :
-    print()
+
 
 keyboard.add_hotkey('ctrl+alt+a', on_click)
 
