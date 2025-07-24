@@ -66,45 +66,41 @@ O setor financeiro da empresa dm que atuo lida com muitas faturas digitais que c
 
 ## O que você precisa instalar antes
 
-### 1. Python (obrigatório)
-Baixe e instale o Python pelo site oficial:
-**https://www.python.org/downloads/**
+### 🚀 Método automatizado (recomendado):
+1. **Execute:** `LEITOR_AUTOMATION.bat` (instala Python, bibliotecas e dependências automaticamente)
 
-Na hora de instalar, MARQUE a opção "Add Python to PATH" (muito importante!)
+### ⚙️ Método manual:
+1. **Baixe Python 3.11 LTS:** https://www.python.org/downloads/ (marque "Add Python to PATH")
+2. **Baixe Visual C++ 2013:** https://www.microsoft.com/en-us/download/details.aspx?id=40784
+3. **Instale bibliotecas Python:**
+   ```bash
+   pip install opencv-python pyzbar pyautogui keyboard pyperclip
+   ```
+4. **Instale dependência Windows (.whl) dentro de /dependencies:**
+   ```bash
+   pip install pyzbar-0.1.9-py2.py3-none-win_amd64.whl
+   ```
 
-### 2. Visual C++ 2013 Redistributable
-**Obrigatório para o pyzbar funcionar:**
-https://www.microsoft.com/en-us/download/details.aspx?id=40784
-
-### 3. Bibliotecas Python
-Abra o **Prompt de Comando** (cmd) e digite:
-
-```bash
-pip install opencv-python pyzbar pyautogui keyboard pyperclip
-```
-
-### 4. Dependência especial (pyzbar para Windows)
-Na pasta `dependencies` tem o arquivo `pyzbar-0.1.9-py2.py3-none-win_amd64.whl`
-
-**Por que precisa disso?** O pyzbar depende de DLLs específicas do Windows que nem sempre instalam automaticamente. Este arquivo contém as bibliotecas pré-compiladas, basicamente o Python não exatamente uma lib nativa que lê códigos assim, mas ele tem as ferramentas pra usar algo pronto, entendi assim.
-
-**Para instalar:**
-```bash
-cd dependencies
-pip install pyzbar-0.1.9-py2.py3-none-win_amd64.whl
-```
+> **Por que o arquivo .whl?** O pyzbar precisa de DLLs específicas do Windows que nem sempre instalam automaticamente. Este arquivo contém as bibliotecas pré-compiladas.
 
 ## Como usar (passo a passo)
 
-### Método simples:
-1. Execute o arquivo `project.py`:
-   ```bash
-   python project.py
-   ```
+### 🎯 Método automatizado (.bat):
+1. Execute `EXECUTAR_LEITOR.bat`
 2. Pressione **z+x+c** quando quiser ler um código
 3. Selecione a área do código de barras na tela
 4. Clique no botão "Print"
 5. O número será copiado automaticamente
+
+### 📱 Criar atalho na área de trabalho:
+1. Botão direito no `EXECUTAR_LEITOR.bat` → "Enviar para" → "Área de trabalho"
+2. **Para trocar ícone:** Botão direito no atalho → "Propriedades" → "Alterar ícone"
+3. Renomear para "LEITOR AUTOMATION"
+
+### 💻 Método manual (cmd):
+```bash
+python project.py
+```
 
 ### O que acontece na tela:
 - Tela escura transparente aparece
@@ -194,3 +190,41 @@ popup.after(1000, popup.destroy)  # 1000 = 1 segundo
 ---
 
 **Sistema desenvolvido para otimizar o trabalho do setor financeiro**
+
+## Estrutura do projeto
+
+```
+print-faturas-automation/
+├── project.py                  # Sistema final integrado
+├── LEITOR_AUTOMATION.bat       # Script de instalação de dependências  
+├── EXECUTAR_LEITOR.bat         # Script para executar o sistema
+├── 1-keyboard-detec.py         # Teste inicial de teclas
+├── 2-print-screen.py           # Captura de tela
+├── 3-mouse-click.py            # Interface de seleção
+├── 4-integrando.py             # Primeira integração
+├── 5-reader-barcode.py         # Leitor de códigos
+├── 6-testando-thread.py        # Testes de threading
+├── 7-integrando-thread.py      # Sistema com threads
+├── pyzbar-0.1.9-py2.py3-none-win_amd64.whl  # Dependência Windows
+└── README.md
+```
+
+## Arquivos .bat incluídos
+
+### `LEITOR_AUTOMATION.bat` - Instalador automático
+- Verifica se Python está instalado
+- Instala todas as bibliotecas necessárias
+- Instala a dependência .whl (procura na pasta atual ou dependencies/)
+- Testa se tudo funcionou
+- Lembra de baixar Visual C++ 2013
+
+### `EXECUTAR_LEITOR.bat` - Executar sistema
+- Interface visual amigável
+- Executa o `project.py` automaticamente
+- Ideal para criar atalho na área de trabalho
+
+### Como personalizar o atalho:
+1. Botão direito no `EXECUTAR_LEITOR.bat` → "Enviar para" → "Área de trabalho"
+2. Botão direito no atalho criado → "Propriedades"
+3. Aba "Atalho" → "Alterar ícone" → Escolher sua imagem .ico
+4. Renomear para "LEITOR AUTOMATION"

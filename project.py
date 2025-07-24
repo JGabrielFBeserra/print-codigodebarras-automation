@@ -41,7 +41,7 @@ def on_click():
             popup.geometry(f'+{x}+{y}')
 
             # fecha depois de 3 segundos
-            popup.after(1000, popup.destroy)
+            popup.after(1500, popup.destroy)
 
             popup.mainloop()
 
@@ -63,7 +63,7 @@ def on_click():
                         codigo = barcode.data.decode("utf-8")
                         print("📦 Código:", codigo)
                         pyperclip.copy(codigo)
-                        mensagem(f"Código Copiado: {codigo}")
+                        mensagem(f"Sucesso:✅✅✅ Código Copiado = {codigo}")
                     except Exception:
                         mensagem("Erro: Código de Barras Inválido")
 
