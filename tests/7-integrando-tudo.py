@@ -6,9 +6,6 @@ import os
 from pyzbar.pyzbar import decode
 import pyperclip
 
-
-
-
 start_x, start_y = None, None
 end_x, end_y = None, None
 rect_id = None

@@ -52,27 +52,55 @@ def on_click():
                 if img is None:
                     mensagem("Erro ao abrir imagem.")
                     return
+                
+                escalas_testes = [1,2,3,4,5]
+                
+                for escala in escalas_testes:
+                    if escala == 1:
+                        test_img = img
+                    else:
+                        height, width = img.shape[:2] # descubro o tamanho da img [:2] só os dois primeiros valores
+                        nova_width = int(width * escala)
+                        nova_height = int(height * escala)
+                        test_img = cv2.resize(img, (nova_width, nova_height), interpolation=cv2.INTER_CUBIC) # aumenta a imagem e cria pixels novos com mais qualidade
 
-                barcodes = decode(img)
-                if not barcodes:
-                    mensagem("Erro: Nenhum código de Barras Encontrado")
-                    return
+                    # converte para escala cinza
+                    gray = cv2.cvtColor(test_img, cv2.COLOR_BGR2GRAY)
+                    
+                    # testes para tentar ler a imagem
+                    images_to_try = [
+                        test_img,  # ori colorida
+                        gray,  # escala de cinza
+                        cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],  # binariza em preto e branco
+                        cv2.GaussianBlur(gray, (3, 3), 0)  # desfoca para suavizar
+                    ]
+                    
+                    for escala_teste, imagem_tratada in enumerate(images_to_try):
+                        barcodes = decode(imagem_tratada)
+                        if barcodes:
+                            print(f"✅ Código encontrado no processamento Foi encontrado na escala: {escala_teste} e na imagem: {imagem_tratada}")
+                            break
+                    
+                    if not barcodes:
+                        mensagem("Erro: Nenhum código de Barras Encontrado")
+                        print("Nenhum código de barras identificado")
+                        return
 
-                for barcode in barcodes:
-                    try:
-                        codigo = barcode.data.decode("utf-8")
-                        print("📦 Código:", codigo)
-                        pyperclip.copy(codigo)
-                        mensagem(f"Sucesso:✅✅✅ Código Copiado = {codigo}")
-                    except Exception:
-                        mensagem("Erro: Código de Barras Inválido")
+                    for barcode in barcodes:
+                        try:
+                            codigo = barcode.data.decode("utf-8")
+                            print("📦 Código:", codigo)
+                            pyperclip.copy(codigo)
+                            mensagem(f"Sucesso:✅✅✅ Código Copiado = {codigo}")
+                            return  
+                        except Exception:
+                            mensagem("Erro: Código de Barras Inválido")
 
             except Exception as e:
-                mensagem_erro(f"Erro inesperado: {e}")
+                mensagem(f"Erro inesperado: {e}")  
             finally:
                 if os.path.exists("recorte.png"):
                     os.remove("recorte.png")
-
 
         def print_screen():
             root.destroy()
@@ -93,8 +121,13 @@ def on_click():
             global start_x, start_y, btn_id
             start_x, start_y = event.x, event.y
             if btn_id:
-                btn_id.destroy()
-                btn_id = None
+                try:
+                    if btn_id.winfo_exists():
+                        btn_id.destroy()
+                except tk.TclError:
+                    pass  #ja foi destruido
+                finally:
+                    btn_id = None
 
         def on_mouse_drag(event):
             global rect_id
