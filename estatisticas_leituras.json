@@ -1,0 +1,6 @@
+{"codigo": "ABxy12$", "tipo-codigo": "CODE128", "escala": 2, "tipo-imagem": "binaria"}
+{"codigo": "0012345000065", "tipo-codigo": "EAN13", "escala": 2, "tipo-imagem": "normal"}
+{"codigo": "ABC123", "tipo-codigo": "CODE39", "escala": 3, "tipo-imagem": "desfocada"}
+{"erro": "nao foi lido nenhum codigo de barras"}
+{"erro": "nao foi lido nenhum codigo de barras"}
+{"codigo": "ABxy12$", "tipo-codigo": "CODE128", "escala": 2, "tipo-imagem": "binaria"}

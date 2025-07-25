@@ -5,7 +5,7 @@ import cv2
 import os
 from pyzbar.pyzbar import decode
 import pyperclip
-
+import json
 
 
 
@@ -21,7 +21,7 @@ def on_click():
     def abrir_janela():
         global root, canvas
         
-        def mensagem(text):
+        def mensagem(text, tempo=1500):
             popup = tk.Tk()
             popup.overrideredirect(True)  # remove bordas
             popup.attributes("-topmost", True)
@@ -41,12 +41,15 @@ def on_click():
             popup.geometry(f'+{x}+{y}')
 
             # fecha depois de 3 segundos
-            popup.after(1500, popup.destroy)
+            popup.after(tempo, popup.destroy)
 
             popup.mainloop()
 
         def reader_barcode_copy():
             global codigo
+            
+            barcodes = []
+            
             try:
                 img = cv2.imread("recorte.png")
                 if img is None:
@@ -55,7 +58,10 @@ def on_click():
                 
                 escalas_testes = [1,2,3,4,5]
                 
+                
                 for escala in escalas_testes:
+                    if barcodes:
+                        break
                     if escala == 1:
                         test_img = img
                     else:
@@ -69,33 +75,50 @@ def on_click():
                     
                     # testes para tentar ler a imagem
                     images_to_try = [
-                        test_img,  # ori colorida
-                        gray,  # escala de cinza
-                        cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],  # binariza em preto e branco
-                        cv2.GaussianBlur(gray, (3, 3), 0)  # desfoca para suavizar
-                    ]
-                    
-                    for escala_teste, imagem_tratada in enumerate(images_to_try):
+                        ("normal", test_img),  # img tratada colorida
+                        ("cinza", gray),  # escala de cinza
+                        ("binaria", cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]),  # binariza em preto e branco
+                        ("desfocada", cv2.GaussianBlur(gray, (3, 3), 0))  # desfoca para suavizar
+                    ]         
+                    for escala_teste, (nome_tratamento, imagem_tratada) in enumerate(images_to_try):
                         barcodes = decode(imagem_tratada)
                         if barcodes:
-                            print(f"✅ Código encontrado no processamento Foi encontrado na escala: {escala_teste} e na imagem: {imagem_tratada}")
+                            print(f"✅ Código encontrado no processamento Foi encontrado na escala: {escala}x e na imagem: {nome_tratamento}")
+                            
+                           
                             break
-                    
-                    if not barcodes:
-                        mensagem("Erro: Nenhum código de Barras Encontrado")
-                        print("Nenhum código de barras identificado")
-                        return
-
-                    for barcode in barcodes:
-                        try:
-                            codigo = barcode.data.decode("utf-8")
-                            print("📦 Código:", codigo)
-                            pyperclip.copy(codigo)
-                            mensagem(f"Sucesso:✅✅✅ Código Copiado = {codigo}")
-                            return  
-                        except Exception:
-                            mensagem("Erro: Código de Barras Inválido")
-
+                
+                if not barcodes:
+                    mensagem("Erro: Nenhum código de barras encontrado\n💡 Dica: Tente selecionar só o código ou dar zoom na página", 4000)
+                    with open("estatisticas_leituras.json", "a", encoding="utf-8") as f:
+                        error = {
+                            "erro": "nao foi lido nenhum codigo de barras"
+                        }
+                        json.dump(error, f)
+                        f.write("\n")
+                        
+                    return
+                for barcode in barcodes:
+                    try:
+                        codigo = barcode.data.decode("utf-8")
+                        resultado = {
+                            "codigo": codigo,
+                            "tipo-codigo": barcode.type,
+                            "escala": escala,
+                            "tipo-imagem": nome_tratamento
+                        }
+            
+                        with open("estatisticas_leituras.json", "a", encoding="utf-8") as f:
+                            json.dump(resultado, f)
+                            f.write("\n") 
+                        
+                        print("📦 Código:", codigo)
+                        pyperclip.copy(codigo)
+                        mensagem(f"Sucesso:✅✅✅ Código Copiado = {codigo}")
+                        return  
+                    except Exception:
+                        mensagem("ERRO PERIGOSO: Nenhum código identificado")
+               
             except Exception as e:
                 mensagem(f"Erro inesperado: {e}")  
             finally:
@@ -143,7 +166,7 @@ def on_click():
             end_x, end_y = event.x, event.y
             show_action_box(end_x, end_y)
 
-        # ⚙️ agora criamos a janela:
+        
         root = tk.Tk()
         root.attributes("-fullscreen", True)
         root.configure(bg='black')
@@ -156,22 +179,8 @@ def on_click():
         canvas.bind("<B1-Motion>", on_mouse_drag)
         canvas.bind("<ButtonRelease-1>", on_mouse_release)
         root.bind("<Escape>", lambda e: root.destroy())
-
         root.mainloop()
-
+        
     abrir_janela()
-
-    
-
-
-
 keyboard.add_hotkey('z+x+c', on_click)
-
-
-
-
-    
-
-
-
 keyboard.wait()
